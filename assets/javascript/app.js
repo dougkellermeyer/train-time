@@ -20,7 +20,7 @@ $("#add-train-btn").on("click", function (event) {
   // Grabs user input
   var trainName = $("#train-name-input").val().trim();
   var trainDest = $("#dest-input").val().trim();
-  var trainFirst = moment($("#first-input").val().trim(),"HH:mm").format("X");
+  var trainFirst = moment($("#first-input").val().trim(),"HH:mm").subtract(1,"years").format("X");
   var trainFreq = $("#freq-input").val().trim();
 
   // Creates local "ttrainorary" object for holding train data
@@ -56,6 +56,7 @@ database.ref().on("child_added", function (childSnapshot, prevChildKey) {
   var trainName = childSnapshot.val().name;
   var trainDest = childSnapshot.val().dest;
   var trainFirst = childSnapshot.val().first;
+  console.log(moment(trainFirst));
   var trainFreq = childSnapshot.val().freq;
 
   // train Info
@@ -69,8 +70,15 @@ database.ref().on("child_added", function (childSnapshot, prevChildKey) {
 
   // Calculate the difference from the first train to the next train
 
-  var nextTrain = moment(trainFirst, "HH:mm").add(trainFreq, "minutes").format("HH:mm");
-  console.log(nextTrain);
+  //take the time now minus the start and then divide by the frequency.
+  var rem = moment().diff(moment.unix(trainFirst));
+  console.log(rem);
+  var remainder = moment().diff(moment.unix(trainFirst), "minutes")%trainFreq;
+  console.log(remainder);
+  console.log(trainFreq-remainder);
+
+var timeLeft = trainFreq-remainder;
+var nextTrain = moment().add(timeLeft,"minutes").format("HH:mm");  
 
 
   // Add each train's data into the table
